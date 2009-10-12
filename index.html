@@ -1,0 +1,39 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" id="sixapart-standard">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>Lisp!</title>
+  <script type="text/javascript" src="lisp-builtins.js"></script>
+  <script type="text/javascript" src="lisp.js"></script>
+  <script type="text/javascript" src="lisp-env.js"></script>
+  <script type="text/javascript" src="lisp-parser.js"></script>
+  <script type="text/javascript" src="lisp-support.js"></script>
+  <script type="text/javascript" src="lisp-library.js"></script>
+</head>
+<body>
+  <form name="input">
+    <b>Input</b><br />
+    <textarea name="inputbox" rows="12" cols="120">
+(defun fib (x)
+  (cond ((eq x 0) 0)
+        ((eq x 1) 1)
+        (t (+ (fib (- x 2)) (fib (- x 1))))))
+(mapcar (quote fib) (quote (1 2 3 4 5 6 7 8 9)))
+    </textarea>
+
+    <p>
+      <input type="button" name="eval" value="Evaluate"
+             onclick="evaluateInput(this.form.inputbox, this.form.outputbox,
+             this.form.parsebox); this.form.inputbox.focus();" />
+    </p>
+    <p>
+      <b>Output</b><br />
+      <textarea name="outputbox" rows="6" cols="120"></textarea>
+    </p>
+    <p>
+      <b>Parsed</b><br />
+      <textarea name="parsebox" rows="6" cols="120"></textarea>
+    </p>
+  </form>
+</body>
+</html>

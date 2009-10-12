@@ -1,0 +1,51 @@
+[*
+
+
+*]
+
+/~ Tokens to be ignored ~/
+!  	  ' |\r|\n|\t'
+	  ;
+
+/~ Grammar tokens ~/
+   	      '\+'				Symbol
+   	      '\-'				Symbol
+   	      '/'				Symbol
+   	      '\*'				Symbol
+   	      '\('				OParen
+	      '\)'				CParen
+	      ';.*$'				/~ Comments ~/
+	      '[A-Za-z_][A-Za-z0-9_]*'		Symbol
+	      '[0-9]+'				Integer
+	      '[0-9]+\.[0-9]*|[0-9]*\.[0-9]+'	Float
+	      '\"[^\"]*\"'			String
+              '\''				Quote
+              'nil'				Nil
+              't'				True
+              '\([ \r\n\t]*\)'			Nil
+	      ;
+
+##
+
+Program:      Program SExpr [* lispProgram.push(%2); *]
+              |
+              ;
+
+Atom:	      Symbol	[* %% = new SymbolNode(%1); *]
+	      | Integer	[* %% = new NumberNode(parseInt(%1)); *]
+	      | Float	[* %% = new NumberNode(parseFloat(%1)); *]
+	      | String	[* %% = new StringNode(%1); *]
+	      | Nil	[* %% = new NilNode(); *]
+	      | True	[* %% = new TrueNode(); *]
+	      ;
+
+SExpr:	      Atom
+	      | Quote SExpr [* %% = new ListNode(new Array(new SymbolNode('quote'), %2)); *]
+	      | OParen SExprList CParen [* %% = new ListNode(%2); *]
+	      ;
+
+SExprList:    SExpr             [* %% = new Array(%1); *]
+              | SExprList SExpr [* %% = %1; %%.push(%2); *]
+	      ;
+
+/~ (setq fib (lambda (x) (cond (eq x 1) 1 (* x (fib (- x 1)))))) ~/
