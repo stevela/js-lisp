@@ -1,0 +1,69 @@
+/~
+
+Copyright 2009 Stephen John Lacey
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License. 
+
+ ~/
+
+[*
+
+
+*]
+
+/~ Tokens to be ignored ~/
+!  	  ' |\r|\n|\t'
+	  ;
+
+/~ Grammar tokens ~/
+   	      '\+'				Symbol
+   	      '\-'				Symbol
+   	      '/'				Symbol
+   	      '\*'				Symbol
+   	      '\('				OParen
+	      '\)'				CParen
+	      ';.*$'				/~ Comments ~/
+	      '[A-Za-z_][A-Za-z0-9_]*'		Symbol
+	      '[0-9]+'				Integer
+	      '[0-9]+\.[0-9]*|[0-9]*\.[0-9]+'	Float
+	      '\"[^\"]*\"'			String
+              '\''				Quote
+              'nil'				Nil
+              't'				True
+              '\([ \r\n\t]*\)'			Nil
+	      ;
+
+##
+
+Program:      Program SExpr [* lispProgram.push(%2); *]
+              |
+              ;
+
+Atom:	      Symbol	[* %% = new SymbolNode(%1); *]
+	      | Integer	[* %% = new NumberNode(parseInt(%1)); *]
+	      | Float	[* %% = new NumberNode(parseFloat(%1)); *]
+	      | String	[* %% = new StringNode(%1); *]
+	      | Nil	[* %% = new NilNode(); *]
+	      | True	[* %% = new TrueNode(); *]
+	      ;
+
+SExpr:	      Atom
+	      | Quote SExpr [* %% = new ListNode(new Array(new SymbolNode('quote'), %2)); *]
+	      | OParen SExprList CParen [* %% = new ListNode(%2); *]
+	      ;
+
+SExprList:    SExpr             [* %% = new Array(%1); *]
+              | SExprList SExpr [* %% = %1; %%.push(%2); *]
+	      ;
+
+/~ (setq fib (lambda (x) (cond (eq x 1) 1 (* x (fib (- x 1)))))) ~/
